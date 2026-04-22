@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
+
 	"piggy.com/internal/db/sqlc"
 )
 
@@ -41,8 +42,8 @@ func (u *Impl) Do() sqlc.Querier {
 	return sqlc.New(u.db)
 }
 
-// Migrate function applies migrations to the database.
-func Migrate(dbURL string, migrationsPath string, _ zerolog.Logger) error {
+// MigrateUp function applies migrations to the database.
+func MigrateUp(dbURL string, migrationsPath string, logger zerolog.Logger) error {
 	absPath, err := filepath.Abs(migrationsPath)
 	if err != nil {
 		return err

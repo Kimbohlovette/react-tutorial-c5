@@ -27,7 +27,7 @@ export const getAllTransactions = async (
 		const res = await axios.get(url);
 
 		return {
-			transactions: res.data.transactions as TransactionType[],
+			transactions: res.data as TransactionType[],
 			error: null,
 		};
 	} catch (error) {
