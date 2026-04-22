@@ -1,0 +1,13 @@
+func (s *Service) CreateTransaction(ctx context.Context, payload models.CreateTransactionPayload) (models.Transaction, error) {
+
+return models.Transaction{}, nil
+}
+
+func (s *Service) GetTransactions(ctx context.Context) ([]models.Transaction, error) {
+	// implement get transactions
+	transactions, err := s.repo.Do().GetTransactions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}

@@ -3,11 +3,11 @@ import StatsCard from "@/components/Card";
 import Navbar from "@/components/navbar";
 import TransactionsList from "@/components/TransactionsList";
 import Button from "@/components/Button";
-import { ToastContainer } from "react-toastify";
 import { useGetTransactions } from "@/hooks/useFetchTransactions";
 
 export default function Home() {
 	const recentTransactions = useGetTransactions({ size: 5 });
+	console.log("In the component: ", recentTransactions);
 	return (
 		<>
 			<div className="flex flex-col flex-1 min-h-screen bg-slate-50 dark:bg-slate-900">

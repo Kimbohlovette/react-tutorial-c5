@@ -3,6 +3,7 @@ export interface TransactionType {
 	reason: string;
 	createdAt: string;
 	type: "saving" | "withdrawal";
+	id?: string;
 }
 
 export interface GetTransactionsParamsType {
