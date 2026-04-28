@@ -1,10 +1,11 @@
 import { GetTransactionsParamsType, TransactionType } from "@/types/interfaces";
-import axios from "axios";
+import { api } from "@/utils/auth";
+
 export interface GetTransactionsRes {
 	transactions: TransactionType[];
 	error: any;
 }
-const BASEURL = "http://localhost:8080";
+
 export const getAllTransactions = async (
 	query: GetTransactionsParamsType,
 ): Promise<GetTransactionsRes> => {
@@ -17,14 +18,10 @@ export const getAllTransactions = async (
 		queries.push("type=" + query.type);
 	}
 
-	const url =
-		BASEURL +
-		"/api/v1/transactions" +
-		(queries.length > 0 ? "?" : "") +
-		queries.join("&");
+	const url = "/api/v1/transactions" + (queries.length > 0 ? "?" : "") + queries.join("&");
 
 	try {
-		const res = await axios.get(url);
+		const res = await api.get(url);
 
 		return {
 			transactions: res.data as TransactionType[],
@@ -37,6 +34,3 @@ export const getAllTransactions = async (
 		};
 	}
 };
-
-
-
