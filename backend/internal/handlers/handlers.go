@@ -35,7 +35,9 @@ func (h *Handler) CreateTransaction(c *gin.Context) {
 
 
 func (h *Handler) GetTransactions(c *gin.Context) {
-	transactions, err := h.service.GetTransactions(c)
+	// Get the transaction type from query parameters, default to empty string if not provided
+	transactionType := c.Query("type")
+	transactions, err := h.service.GetTransactions(c , transactionType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
