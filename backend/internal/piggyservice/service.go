@@ -31,8 +31,8 @@ func (s *Service) CreateTransaction(ctx context.Context, payload models.CreateTr
 	return sqlCToAppTransaction(transaction), nil
 }
 
-func (s *Service) GetTransactions(ctx context.Context) (*[]models.Transaction, error) {
-	txns, err := s.repo.Do().GetTransactions(ctx)
+func (s *Service) GetTransactions(ctx context.Context, transactionType string) (*[]models.Transaction, error) {
+	txns, err := s.repo.Do().GetTransactions(ctx, transactionType)
 	if err != nil {
 		return nil, err
 	}

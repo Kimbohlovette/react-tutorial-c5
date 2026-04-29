@@ -6,7 +6,7 @@ export interface ResponseType {
   error: any;
 }
 
-const BASEURL = "http://localhost:8065";
+const BASEURL = "http://localhost:8080";
 
 export const saveTransaction = async (
   payload: TransactionType,
