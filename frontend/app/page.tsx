@@ -4,42 +4,58 @@ import Navbar from "@/components/navbar";
 import TransactionsList from "@/components/TransactionsList";
 import Button from "@/components/Button";
 import { useGetTransactions } from "@/hooks/useFetchTransactions";
+import Link from "next/link";
 
-export default function Home() {
-	const recentTransactions = useGetTransactions({ size: 5 });
-	console.log("In the component: ", recentTransactions);
+
+export default function LandingPage() {
+	
 	return (
 		<>
 			<div className="flex flex-col flex-1 min-h-screen bg-slate-50 dark:bg-slate-900">
-				<Navbar />
+				<header className="w-full border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+			<div className="max-w-3xl mx-auto flex items-center justify-between px-6 py-4">
+				<Link
+					href="/"
+					className="text-2xl font-bold text-blue-600 dark:text-blue-400 tracking-tight"
+				>
+					🐷 Piggy
+				</Link>
+				<nav className="flex items-center gap-6">
+					
+					<div className="flex items-center gap-4 text-sm font-medium">
+						<Link
+							href="/register"
+							className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md transition-colors"
+						>
+							Sign up
+						</Link>
+		
+					</div>
+				</nav>
+			</div>
+		</header>
 				<main className="flex-1 w-full max-w-3xl mx-auto px-6 py-10 flex flex-col gap-8">
 					<section className="flex gap-4">
-						<StatsCard title="Total Savings" text="53,000 CFA" />
-						<StatsCard
-							title="Total Withdrawals"
-							text="100,000 CFA"
-						/>
+						{/* <img src="../assets/landing-page.png" alt="" /> */}
 					</section>
-					<section className="flex gap-3">
+					<section className="flex gap-3 justify-center m-auto">
 						<Button
-							text="Add Savings"
+							text="Get Started"
 							onClick={() => {
-								window.location.href = "/save";
+								window.location.href = "/register";
 							}}
 						/>
 						<Button
-							text="Make Withdrawal"
+							text="Login"
 							variant="secondary"
 							onClick={() => {
-								window.location.href = "/withdraw";
+								window.location.href = "/login";
 							}}
 						/>
+						
 					</section>
 					<section>
-						<h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3">
-							Recent Transactions
-						</h2>
-						<TransactionsList transactions={recentTransactions} />
+						
 					</section>
 				</main>
 			</div>

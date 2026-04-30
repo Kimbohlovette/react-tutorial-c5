@@ -3,20 +3,49 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/ardanlabs/conf/v3"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/rs/zerolog"
 
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/handlers"
+	"piggy.com/internal/initializers"
 	"piggy.com/internal/piggyservice"
 )
 
+
+type DBConfig struct {
+    DBUser      string `conf:"env:DB_USER,required"`
+    DBPassword  string `conf:"env:DB_PASSWORD,required,mask"`
+    DBHost      string `conf:"env:DB_HOST,required"`
+    DBPort      uint16 `conf:"env:DB_PORT,required"`
+    DBName      string `conf:"env:DB_NAME,required"`
+    TLSDisabled bool   `conf:"env:DB_TLS_DISABLED"`
+}
+
 func main() {
+	//load env file 
+	initializers.LoadEnvs()
+
+	var cfg DBConfig
+
+    // reads from env variables automatically
+    config, err := conf.Parse("", &cfg)
+    if err != nil {
+        if err == conf.ErrHelpWanted {
+            fmt.Println(config)
+            return
+        }
+        log.Fatal("Failed to parse config:", err)
+    }
+
 	route := gin.Default()
 
 	// Configure Cors
@@ -38,7 +67,13 @@ func main() {
 
 	// Initialize repo and apply migrations
 	ctx := context.Background()
-	dbUrl := "postgres://piggy:secret@127.0.0.1:5432/piggydb?sslmode=disable"
+	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+    cfg.DBUser,
+    cfg.DBPassword,
+    cfg.DBHost,
+    cfg.DBPort,
+    cfg.DBName,
+)
 	dbConn, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		panic(err)

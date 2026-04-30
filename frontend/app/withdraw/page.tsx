@@ -26,6 +26,11 @@ function WithdrawPage() {
 		} else {
 			toast.error("Failed to withdraw money! Try again.");
 		}
+
+		setTimeout(() => {
+			window.location.href = "/dashboard"
+		}, 2000);
+		
 	};
 
 	return (

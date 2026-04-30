@@ -10,3 +10,12 @@ export interface GetTransactionsParamsType {
 	type?: "saving" | "withdrawal";
 	size?: number;
 }
+
+export interface UserCredential {
+	username: string;
+	password: string;
+	createdAt: string;
+	deleatedAt?: string;
+	updatedAt?: string;
+	id?: string;
+}

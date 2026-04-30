@@ -27,6 +27,11 @@ function SavePage() {
 		} else {
 			toast.error("Failed to save money! Try again.");
 		}
+
+		setTimeout(() => {
+			window.location.href = "/dashboard"
+		}, 2000);
+
 	};
 
 	return (
