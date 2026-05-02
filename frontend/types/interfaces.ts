@@ -11,11 +11,17 @@ export interface GetTransactionsParamsType {
 	size?: number;
 }
 
-export interface UserCredential {
+export interface UserCredentials {
 	username: string;
+	email?: string;
 	password: string;
 	createdAt: string;
 	deleatedAt?: string;
 	updatedAt?: string;
 	id?: string;
+}
+
+export interface LoginCredentials {
+	identifier: string;
+	password: string;
 }

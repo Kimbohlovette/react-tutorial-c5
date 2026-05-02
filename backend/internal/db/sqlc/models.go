@@ -9,9 +9,20 @@ import (
 )
 
 type Transaction struct {
-	ID        int32            `json:"id"`
+	TransID   string           `json:"trans_id"`
+	CreatedBy *string          `json:"created_by"`
 	Amount    string           `json:"amount"`
 	Reason    *string          `json:"reason"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 	Type      *string          `json:"type"`
+}
+
+type User struct {
+	UserID    string           `json:"user_id"`
+	Username  string           `json:"username"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	DeletedAt pgtype.Timestamp `json:"deleted_at"`
 }

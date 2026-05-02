@@ -2,7 +2,7 @@
 import { saveTransaction } from "@/api/create-transaction";
 import Button from "@/components/Button";
 import Navbar from "@/components/navbar";
-import { TransactionType, UserCredential } from "@/types/interfaces";
+import { LoginCredentials, TransactionType, UserCredentials } from "@/types/interfaces";
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -31,10 +31,9 @@ function LoginPage() {
 
     const handleLogin = () => {
         console.log("Executed!");
-        const payload: UserCredential = {
+        const payload: LoginCredentials = {
             username,
             password,
-            createdAt: Date(),
         };
 
         window.location.href = "/dashboard";

@@ -1,10 +1,12 @@
 import { GetTransactionsParamsType, TransactionType } from "@/types/interfaces";
 import axios from "axios";
+
 export interface GetTransactionsRes {
 	transactions: TransactionType[];
 	error: any;
 }
 const BASEURL = "http://localhost:8080";
+
 export const getAllTransactions = async (
 	query: GetTransactionsParamsType,
 ): Promise<GetTransactionsRes> => {

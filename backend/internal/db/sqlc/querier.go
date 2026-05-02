@@ -10,7 +10,11 @@ import (
 
 type Querier interface {
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetTransactions(ctx context.Context) ([]Transaction, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByUsername(ctx context.Context, username string) (User, error)
+	GetUserTransactions(ctx context.Context, createdBy *string) ([]Transaction, error)
 }
 
 var _ Querier = (*Queries)(nil)

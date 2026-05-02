@@ -10,20 +10,27 @@ import (
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions (amount, reason, type) VALUES ($1, $2, $3) RETURNING id, amount, reason, created_at, type
+INSERT INTO transactions (created_by, amount, reason, type) VALUES ($1, $2, $3, $4) RETURNING trans_id, created_by, amount, reason, created_at, type
 `
 
 type CreateTransactionParams struct {
-	Amount string  `json:"amount"`
-	Reason *string `json:"reason"`
-	Type   *string `json:"type"`
+	CreatedBy *string `json:"created_by"`
+	Amount    string  `json:"amount"`
+	Reason    *string `json:"reason"`
+	Type      *string `json:"type"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRow(ctx, createTransaction, arg.Amount, arg.Reason, arg.Type)
+	row := q.db.QueryRow(ctx, createTransaction,
+		arg.CreatedBy,
+		arg.Amount,
+		arg.Reason,
+		arg.Type,
+	)
 	var i Transaction
 	err := row.Scan(
-		&i.ID,
+		&i.TransID,
+		&i.CreatedBy,
 		&i.Amount,
 		&i.Reason,
 		&i.CreatedAt,
@@ -32,8 +39,35 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (username, email, password)
+VALUES ($1, $2, $3)
+RETURNING user_id, username, email, password, created_at, updated_at, deleted_at
+`
+
+type CreateUserParams struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Email, arg.Password)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getTransactions = `-- name: GetTransactions :many
-SELECT id, amount, reason, created_at, type FROM transactions
+SELECT trans_id, created_by, amount, reason, created_at, type FROM transactions
 `
 
 func (q *Queries) GetTransactions(ctx context.Context) ([]Transaction, error) {
@@ -46,7 +80,82 @@ func (q *Queries) GetTransactions(ctx context.Context) ([]Transaction, error) {
 	for rows.Next() {
 		var i Transaction
 		if err := rows.Scan(
-			&i.ID,
+			&i.TransID,
+			&i.CreatedBy,
+			&i.Amount,
+			&i.Reason,
+			&i.CreatedAt,
+			&i.Type,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT user_id, username, email, password, created_at, updated_at, deleted_at FROM users
+WHERE email = $1 
+LIMIT 1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT user_id, username, email, password, created_at, updated_at, deleted_at FROM users
+WHERE username = $1 
+LIMIT 1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getUserTransactions = `-- name: GetUserTransactions :many
+SELECT trans_id, created_by, amount, reason, created_at, type FROM transactions
+WHERE created_by = $1
+`
+
+func (q *Queries) GetUserTransactions(ctx context.Context, createdBy *string) ([]Transaction, error) {
+	rows, err := q.db.Query(ctx, getUserTransactions, createdBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Transaction{}
+	for rows.Next() {
+		var i Transaction
+		if err := rows.Scan(
+			&i.TransID,
+			&i.CreatedBy,
 			&i.Amount,
 			&i.Reason,
 			&i.CreatedAt,

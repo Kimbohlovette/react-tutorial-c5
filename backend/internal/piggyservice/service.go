@@ -2,7 +2,13 @@ package piggyservice
 
 import (
 	"context"
+	"errors"
+	"os"
+	"strings"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/db/sqlc"
 	"piggy.com/internal/models"
@@ -17,6 +23,20 @@ func NewService(repo repo.Repository) *Service {
 }
 
 // define service methods here
+func (s *Service) CreateUser(ctx context.Context, payload models.CreateUserPayload) (*models.User, error) {
+	// create user
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password),bcrypt.DefaultCost)
+	user, err := s.repo.Do().CreateUser(ctx, sqlc.CreateUserParams{
+		Username: payload.Username,
+		Email:   payload.Email,
+		Password: string(hashedPassword),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return sqlCToAppUser(user), nil
+}
+
 
 func (s *Service) CreateTransaction(ctx context.Context, payload models.CreateTransactionPayload) (*models.Transaction, error) {
 	// create the transaction
@@ -31,6 +51,48 @@ func (s *Service) CreateTransaction(ctx context.Context, payload models.CreateTr
 	return sqlCToAppTransaction(transaction), nil
 }
 
+func (s *Service) GetUser(ctx context.Context, payload models.GetUserPayload) (*models.GetUserResponse, error) {
+	var dbUser sqlc.User
+	var err error
+	
+	if strings.Contains(payload.Identifier, "@"){
+		dbUser, err = s.repo.Do().GetUserByEmail(ctx, payload.Identifier)
+	} else {
+		dbUser, err = s.repo.Do().GetUserByUsername(ctx, payload.Identifier)
+	}
+
+	if err != nil {
+		return nil, errors.New("Invalid Credentials")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(payload.Password)); err != nil {
+		return nil, errors.New("Invalid Credentials")
+	}
+
+	token, err := generateJWT(dbUser.UserID, dbUser.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.GetUserResponse{
+		Token: token,
+		User: *sqlCToAppUser(dbUser),
+	}, nil
+}
+
+func generateJWT(userID string, username string) (string, error) {
+	secret := os.Getenv("JWT_SECRET")
+
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"username": username,
+		"exp": time.Now().Add(24 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
+}
+
 func (s *Service) GetTransactions(ctx context.Context) (*[]models.Transaction, error) {
 	txns, err := s.repo.Do().GetTransactions(ctx)
 	if err != nil {
@@ -43,12 +105,36 @@ func (s *Service) GetTransactions(ctx context.Context) (*[]models.Transaction, e
 	return &transactions, nil
 }
 
+func (s *Service) GetUserTransactions(ctx context.Context, userID string) (*[]models.Transaction, error) {
+	txns, err := s.repo.Do().GetUserTransactions(ctx, &userID)
+	if err != nil {
+		return nil, err
+	}
+	transactions := []models.Transaction{}
+	for _, v := range txns {
+		transactions = append(transactions, *sqlCToAppTransaction(v))
+	} 
+	return &transactions, nil
+}
+
+
 func sqlCToAppTransaction(t sqlc.Transaction) *models.Transaction {
 	return &models.Transaction{
 		Amount:    t.Amount,
 		Reason:    *t.Reason,
 		Type:      *t.Type,
-		ID:        &t.ID,
+		ID:        t.TransID,
 		CreatedAt: t.CreatedAt.Time.String(),
 	}
 }
+
+func sqlCToAppUser(u sqlc.User) *models.User {
+	return &models.User{
+		ID:    u.UserID,
+		Username:  u.Username,
+		Email:     u.Email,
+		CreatedAt:       u.CreatedAt.Time.String(),
+		//add updated_at and deleted_at only when implementing user account management
+	}
+}
+
