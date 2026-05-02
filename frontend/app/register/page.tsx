@@ -1,5 +1,5 @@
 "use client";
-import { CreateUser } from "@/api/auth";
+import {  Register } from "@/api/auth";
 import Button from "@/components/Button";
 import {UserCredentials } from "@/types/interfaces";
 import React, { useState } from "react";
@@ -9,26 +9,9 @@ function RegisterPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
-
-    // Handle save transaction
-    // const handleSave = () => {
-    //     console.log("Executed!");
-    //     const payload: TransactionType = {
-    //         username,
-    //         reason,
-    //         type: "saving",
-    //         createdAt: Date(),
-    //     };
-    //    const res = saveTransaction(payload);
-
-    //     console.log("Response from fetch: ", res);
-
-    //     if (res.success) {
-    //         toast("Saving action successful! Redirecting...");
-    //     } else {
-    //         toast.error("Failed to save money! Try again.");
-    //     }
-    // };
+    const [showPassword, setShowPassword] = useState(false)
+    
+    const togglePassword = () => setShowPassword(!showPassword)
 
     const handleRegister = () => {
         console.log("Executed!");
@@ -39,7 +22,7 @@ function RegisterPage() {
             createdAt: Date(),
         };
 
-        const res = CreateUser(payload);
+        const res = Register(payload);
 
         console.log("Response from post: ", res);
 
@@ -84,17 +67,27 @@ function RegisterPage() {
                             />
                         </div>
                         
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 relative">
                             <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                                 Password
                             </label>
                             <input
+                            type={showPassword? "text" : "password"}
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 value={password}
                                 onChange={(value) =>
                                     setPassword(value.target.value)
                                 }
                             />
+                             <button type="button" onClick={togglePassword} className="absolute right-3 bottom-2 ">
+                            {
+                                showPassword ? (
+                                    <img src="/eyelid-closed.png" alt="hide" className="w-5 h-5 invert "/>
+                                ): (
+                                    <img src="/eyelid-open.png" alt="show" className="w-5 h-5 invert" />
+                                )
+                            }
+                            </button>
                         </div>
                         <div className="pt-2">
                             <Button text="Sign up" onClick={handleRegister} />
