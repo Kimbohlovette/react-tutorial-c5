@@ -15,21 +15,21 @@ export const CreateUser = (payload: UserCredentials) => {
         error: null,
         success: true,
     };
-    // axios
-    // 	.post(BASEURL + "/api/v1/transactions", payload)
-    // 	.then((res) => {
-    // 		response = {
-    // 			error: undefined,
-    // 			success: true,
-    // 		};
-    // 	})jwt
+    axios
+    	.post(BASEURL + "/api/v1/register", payload)
+    	.then((res) => {
+    		response = {
+    			error: undefined,
+    			success: true,
+    		};
+    	})
     
-    // 	.catch((err) => {
-    // 		response = {
-    // 			error: err,
-    // 			success: false,
-    // 		};
-    // 	});
+    	.catch((err) => {
+    		response = {
+    			error: err,
+    			success: false,
+    		};
+    	});
     return response;
 };
 

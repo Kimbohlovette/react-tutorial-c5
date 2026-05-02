@@ -32,7 +32,7 @@ function LoginPage() {
     const handleLogin = () => {
         console.log("Executed!");
         const payload: LoginCredentials = {
-            username,
+            identifier: username,
             password,
         };
 

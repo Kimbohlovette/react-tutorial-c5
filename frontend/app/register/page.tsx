@@ -1,4 +1,5 @@
 "use client";
+import { CreateUser } from "@/api/auth";
 import Button from "@/components/Button";
 import {UserCredentials } from "@/types/interfaces";
 import React, { useState } from "react";
@@ -38,16 +39,18 @@ function RegisterPage() {
             createdAt: Date(),
         };
 
-         window.location.href = "/login";
-        // const res = saveTransaction(payload);
+        const res = CreateUser(payload);
 
-        // console.log("Response from fetch: ", res);
+        console.log("Response from post: ", res);
 
-        // if (res.success) {
-        //     toast("Saving action successful! Redirecting...");
-        // } else {
-        //     toast.error("Failed to save money! Try again.");
-        // }
+        if (res.success) {
+            toast("Account creation successful! Redirecting...");
+            setTimeout(() => {
+			window.location.href = "/login"
+		}, 2000);
+         } else {
+             toast.error("Failed to create account! Try again.");
+         }
     };
 
     return (
@@ -65,9 +68,11 @@ function RegisterPage() {
                             <input
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 placeholder="enter email"
-                                value={username}
+                                value={email}
                                 onChange={(v) => setEmail(v.target.value)}
                             />
+                        </div>
+                        <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                                 Username
                             </label>
@@ -78,6 +83,7 @@ function RegisterPage() {
                                 onChange={(v) => setUsername(v.target.value)}
                             />
                         </div>
+                        
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                                 Password

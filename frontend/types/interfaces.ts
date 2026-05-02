@@ -13,7 +13,7 @@ export interface GetTransactionsParamsType {
 
 export interface UserCredentials {
 	username: string;
-	email?: string;
+	email: string;
 	password: string;
 	createdAt: string;
 	deleatedAt?: string;
