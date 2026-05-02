@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog"
 
 	"piggy.com/internal/db/repo"
+	"piggy.com/internal/db/sqlc"
 	"piggy.com/internal/handlers"
 	"piggy.com/internal/piggyservice"
 )
@@ -51,7 +52,8 @@ func main() {
 
 	// Initialize service
 	appService := piggyservice.NewService(repostory)
-	handlers := handlers.NewHandler(appService)
+	authService := piggyservice.NewAuthService(repostory.Do().(*sqlc.Queries))
+	handlers := handlers.NewHandler(appService, authService)
 
 	// Define application endpoints
 	route.POST("/api/v1/transactions", handlers.CreateTransaction)

@@ -13,8 +13,13 @@ export const saveTransaction = async (
 ): Promise<ResponseType> => {
   console.log("Fetch function executed!");
 
+  const userId = localStorage.getItem("piggy_user_id");
   try {
-    const res = await axios.post(BASEURL + "/api/v1/transactions", payload);
+    const res = await axios.post(BASEURL + "/api/v1/transactions", payload, {
+      headers: {
+        "X-User-ID": userId || "",
+      }
+    });
     return {
       success: true,
       error: null,

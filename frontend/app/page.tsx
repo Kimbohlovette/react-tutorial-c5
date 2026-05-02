@@ -4,8 +4,10 @@ import Navbar from "@/components/navbar";
 import TransactionsList from "@/components/TransactionsList";
 import Button from "@/components/Button";
 import { useGetTransactions } from "@/hooks/useFetchTransactions";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 export default function Home() {
+	useAuthGuard();
 	const recentTransactions = useGetTransactions({ size: 5 });
 	console.log("In the component: ", recentTransactions);
 	return (

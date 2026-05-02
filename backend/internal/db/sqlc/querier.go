@@ -9,8 +9,14 @@ import (
 )
 
 type Querier interface {
+	AddToUserSavings(ctx context.Context, arg AddToUserSavingsParams) (User, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
-	GetTransactions(ctx context.Context, typeFilter string) ([]Transaction, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]Transaction, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, id int32) (User, error)
+	UpdateUserSavings(ctx context.Context, arg UpdateUserSavingsParams) (User, error)
+	UpdateUserWithdrawals(ctx context.Context, arg UpdateUserWithdrawalsParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

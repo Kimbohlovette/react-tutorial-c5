@@ -24,7 +24,11 @@ export const getAllTransactions = async (
 		queries.join("&");
 
 	try {
-		const res = await axios.get(url);
+		const res = await axios.get(url, {
+			headers: {
+				"X-User-ID": localStorage.getItem("piggy_user_id") || "",
+			},
+		});
 
 		return {
 			transactions: res.data as TransactionType[],

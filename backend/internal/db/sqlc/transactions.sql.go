@@ -7,23 +7,59 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const addToUserSavings = `-- name: AddToUserSavings :one
+UPDATE users 
+SET total_savings = (CAST(total_savings AS NUMERIC) + CAST($1 AS NUMERIC))::VARCHAR
+WHERE id = $2
+RETURNING id, name, email, password_hash, created_at, total_savings, total_withdrawals
+`
+
+type AddToUserSavingsParams struct {
+	Amount pgtype.Numeric `json:"amount"`
+	ID     int32          `json:"id"`
+}
+
+func (q *Queries) AddToUserSavings(ctx context.Context, arg AddToUserSavingsParams) (User, error) {
+	row := q.db.QueryRow(ctx, addToUserSavings, arg.Amount, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions (amount, reason, type) VALUES ($1, $2, $3) RETURNING id, amount, reason, created_at, type
+INSERT INTO transactions (user_id,amount, reason, type) VALUES ($1, $2, $3, $4) RETURNING id, user_id, amount, reason, created_at, type
 `
 
 type CreateTransactionParams struct {
+	UserID *int32  `json:"user_id"`
 	Amount string  `json:"amount"`
 	Reason *string `json:"reason"`
 	Type   *string `json:"type"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRow(ctx, createTransaction, arg.Amount, arg.Reason, arg.Type)
+	row := q.db.QueryRow(ctx, createTransaction,
+		arg.UserID,
+		arg.Amount,
+		arg.Reason,
+		arg.Type,
+	)
 	var i Transaction
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.Amount,
 		&i.Reason,
 		&i.CreatedAt,
@@ -32,14 +68,44 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, password_hash, created_at, total_savings, total_withdrawals
+`
+
+type CreateUserParams struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"password_hash"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email, arg.PasswordHash)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
 const getTransactions = `-- name: GetTransactions :many
-SELECT id, amount, reason, created_at, type FROM transactions
-WHERE (CAST($1 AS TEXT) = '' OR type = $1)
+SELECT id, user_id, amount, reason, created_at, type FROM transactions
+WHERE user_id = $1 AND (CAST($2 AS TEXT) = '' OR type = $2)
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetTransactions(ctx context.Context, typeFilter string) ([]Transaction, error) {
-	rows, err := q.db.Query(ctx, getTransactions, typeFilter)
+type GetTransactionsParams struct {
+	UserID     *int32 `json:"user_id"`
+	TypeFilter string `json:"type_filter"`
+}
+
+func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]Transaction, error) {
+	rows, err := q.db.Query(ctx, getTransactions, arg.UserID, arg.TypeFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +115,7 @@ func (q *Queries) GetTransactions(ctx context.Context, typeFilter string) ([]Tra
 		var i Transaction
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserID,
 			&i.Amount,
 			&i.Reason,
 			&i.CreatedAt,
@@ -62,4 +129,90 @@ func (q *Queries) GetTransactions(ctx context.Context, typeFilter string) ([]Tra
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, name, email, password_hash, created_at, total_savings, total_withdrawals FROM users WHERE email = $1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, name, email, password_hash, created_at, total_savings, total_withdrawals FROM users WHERE id = $1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
+const updateUserSavings = `-- name: UpdateUserSavings :one
+UPDATE users SET total_savings = $1 WHERE id = $2 RETURNING id, name, email, password_hash, created_at, total_savings, total_withdrawals
+`
+
+type UpdateUserSavingsParams struct {
+	TotalSavings *string `json:"total_savings"`
+	ID           int32   `json:"id"`
+}
+
+func (q *Queries) UpdateUserSavings(ctx context.Context, arg UpdateUserSavingsParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserSavings, arg.TotalSavings, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
+const updateUserWithdrawals = `-- name: UpdateUserWithdrawals :one
+UPDATE users SET total_withdrawals = $1 WHERE id = $2 RETURNING id, name, email, password_hash, created_at, total_savings, total_withdrawals
+`
+
+type UpdateUserWithdrawalsParams struct {
+	TotalWithdrawals *string `json:"total_withdrawals"`
+	ID               int32   `json:"id"`
+}
+
+func (q *Queries) UpdateUserWithdrawals(ctx context.Context, arg UpdateUserWithdrawalsParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserWithdrawals, arg.TotalWithdrawals, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
 }
