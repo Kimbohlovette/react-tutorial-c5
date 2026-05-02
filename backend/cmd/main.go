@@ -59,8 +59,8 @@ func main() {
 
 	v1 := route.Group("/api/v1")
 	// Define application endpoints
-	v1.POST("/signup", handlers.SignUp)
-    v1.POST("/api/v1/login", handlers.Login)
+	route.POST("//api/v/1signup", handlers.SignUp)
+    route.POST("/api/v1/login", handlers.Login)
 
 	//protected routes
 	protected := v1.Group("/")
@@ -68,8 +68,8 @@ func main() {
     
 	
 	{
-		protected.GET("/api/v1/transactions", handlers.GetTransactions) 
-		route.POST("/api/v1/transactions", handlers.CreateTransaction)
+		protected.GET("/transactions", handlers.GetTransactions) 
+		protected.POST("/transactions", handlers.CreateTransaction)
 		
 	}
 	fmt.Println("Server running on port 8080")

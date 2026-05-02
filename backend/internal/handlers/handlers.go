@@ -50,11 +50,20 @@ func (h *Handler) GetTransactions(c *gin.Context) {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Please log in again"})
         return
     }
-    userID := val.(*int32)
+	//important
+   var userID int32
+    if ptr, ok := val.(*int32); ok {
+        userID = *ptr
+    } else if v, ok := val.(int32); ok {
+        userID = v
+    } else {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid User ID type in context"})
+        return
+    }
 	
 	// Get the transaction type from query parameters, default to empty string if not provided
 	transactionType := c.Query("type")
-	transactions, err := h.service.GetTransactions(c.Request.Context() , *userID,  transactionType)
+	transactions, err := h.service.GetTransactions(c.Request.Context() , userID,  transactionType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -11,8 +11,8 @@ export const useAuth = () => {
     try {
       const res = await registerRequest(formData);
       const data = await res.json();
-        const userId = data.user_id || data.id || data.ID;
-         // Adjust based on your backend response
+      const userId = data.user_id || data.id || data.ID;
+
       if (userId) {
         localStorage.setItem("piggy_user_id", userId.toString());
         router.push("/");
@@ -31,23 +31,26 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const res = await loginRequest(formData);
+
+     
       const data = await res.json();
 
-      const userId = data.user_id || data.id || data.ID;
+      if (res.ok) {
+        const userId = data.user_id || data.id || data.ID;
 
-      if (res.ok && userId) {
-        
-        localStorage.setItem("piggy_user_id", userId.toString());
-
-
-        router.push("/"); 
+        if (userId) {
+          localStorage.setItem("piggy_user_id", userId.toString());
+          router.push("/");
+        } else {
+          alert("Login successful, but no User ID received");
+        }
       } else {
-       
         alert(data.error || "Login failed");
       }
     } catch (err) {
       console.error("Login Error:", err);
-      alert("Connection error");
+
+      alert("Server response was not valid JSON. Check Go terminal.");
     } finally {
       setIsLoading(false);
     }
@@ -55,4 +58,3 @@ export const useAuth = () => {
 
   return { signup, login, isLoading };
 };
-
