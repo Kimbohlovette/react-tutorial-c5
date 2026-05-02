@@ -59,3 +59,19 @@ func (h *Handler) GetTransactions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, transactions)
 }
+
+func (h *Handler) GetUser(c *gin.Context) {
+	var payload models.GetUserPayload
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.service.GetUser(c, payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}

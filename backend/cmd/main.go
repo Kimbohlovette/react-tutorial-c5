@@ -91,6 +91,7 @@ func main() {
 
 	// Define application endpoints
 	route.POST("/api/v1/register", handlers.CreateUser)
+	route.POST("/api/v1/login", handlers.GetUser)
 	route.POST("/api/v1/transactions", handlers.CreateTransaction)
 	route.GET("/api/v1/transactions", handlers.GetTransactions) // Run application
 	fmt.Println("Server running on port 8080")
