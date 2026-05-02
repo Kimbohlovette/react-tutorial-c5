@@ -28,6 +28,7 @@ type DBConfig struct {
     DBPort      uint16 `conf:"env:DB_PORT,required"`
     DBName      string `conf:"env:DB_NAME,required"`
     TLSDisabled bool   `conf:"env:DB_TLS_DISABLED"`
+	JWTSecret string `conf:"env:JWT_SECRET,required,mask"`
 }
 
 func main() {
@@ -85,10 +86,11 @@ func main() {
 	}
 
 	// Initialize service
-	appService := piggyservice.NewService(repostory)
+	appService := piggyservice.NewService(repostory, cfg.JWTSecret)
 	handlers := handlers.NewHandler(appService)
 
 	// Define application endpoints
+	route.POST("/api/v1/register", handlers.CreateUser)
 	route.POST("/api/v1/transactions", handlers.CreateTransaction)
 	route.GET("/api/v1/transactions", handlers.GetTransactions) // Run application
 	fmt.Println("Server running on port 8080")

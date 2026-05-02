@@ -3,7 +3,6 @@ package piggyservice
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 	"time"
 
@@ -16,16 +15,21 @@ import (
 
 type Service struct {
 	repo repo.Repository
+	jwtSecret string
 }
 
-func NewService(repo repo.Repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo repo.Repository, jwtSecret string) *Service {
+	return &Service{repo: repo, jwtSecret: jwtSecret}
 }
 
 // define service methods here
 func (s *Service) CreateUser(ctx context.Context, payload models.CreateUserPayload) (*models.User, error) {
 	// create user
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password),bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
 	user, err := s.repo.Do().CreateUser(ctx, sqlc.CreateUserParams{
 		Username: payload.Username,
 		Email:   payload.Email,
@@ -41,6 +45,7 @@ func (s *Service) CreateUser(ctx context.Context, payload models.CreateUserPaylo
 func (s *Service) CreateTransaction(ctx context.Context, payload models.CreateTransactionPayload) (*models.Transaction, error) {
 	// create the transaction
 	transaction, err := s.repo.Do().CreateTransaction(ctx, sqlc.CreateTransactionParams{
+		CreatedBy: &payload.CreatedBy,
 		Amount: payload.Amount,
 		Type:   &payload.Type,
 		Reason: &payload.Reason,
@@ -69,7 +74,7 @@ func (s *Service) GetUser(ctx context.Context, payload models.GetUserPayload) (*
 		return nil, errors.New("Invalid Credentials")
 	}
 
-	token, err := generateJWT(dbUser.UserID, dbUser.Username)
+	token, err := s.generateJWT(dbUser.UserID, dbUser.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -80,9 +85,7 @@ func (s *Service) GetUser(ctx context.Context, payload models.GetUserPayload) (*
 	}, nil
 }
 
-func generateJWT(userID string, username string) (string, error) {
-	secret := os.Getenv("JWT_SECRET")
-
+func (s *Service) generateJWT(userID string, username string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"username": username,
@@ -90,7 +93,7 @@ func generateJWT(userID string, username string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secret))
+	return token.SignedString([]byte(s.jwtSecret))
 }
 
 func (s *Service) GetTransactions(ctx context.Context) (*[]models.Transaction, error) {

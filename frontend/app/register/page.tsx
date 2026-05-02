@@ -38,7 +38,7 @@ function RegisterPage() {
             createdAt: Date(),
         };
 
-         window.location.href = "/dashboard";
+         window.location.href = "/login";
         // const res = saveTransaction(payload);
 
         // console.log("Response from fetch: ", res);

@@ -26,6 +26,7 @@ type GetUserResponse struct {
 }
 
 type CreateTransactionPayload struct {
+	CreatedBy string `json:"CreatedBy"`
 	Amount    string `json:"amount"`
 	Type      string `json:"type"`
 	Reason    string `json:"reason"`
