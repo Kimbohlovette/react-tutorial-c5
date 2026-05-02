@@ -8,6 +8,7 @@ const BASEURL = "http://localhost:8080";
 export const getAllTransactions = async (
 	query: GetTransactionsParamsType,
 ): Promise<GetTransactionsRes> => {
+
 	const queries = [];
 	if (query.size) {
 		queries.push("size=" + query.size);
@@ -24,10 +25,16 @@ export const getAllTransactions = async (
 		queries.join("&");
 
 	try {
-		const res = await axios.get(url);
+		const storedId = localStorage.getItem("piggy_user_id");
+    const userId = storedId === "undefined" || !storedId ? "" : storedId;
+		const res = await axios.get(url, {
+			headers: {
+				"X-User-ID": userId,
+			},
+		});
 
 		return {
-			transactions: res.data as TransactionType[],
+			transactions: res.data as TransactionType[] || res.data as TransactionType[],
 			error: null,
 		};
 	} catch (error) {
