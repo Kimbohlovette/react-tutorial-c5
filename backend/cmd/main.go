@@ -14,6 +14,7 @@ import (
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/handlers"
 	"piggy.com/internal/piggyservice"
+	"piggy.com/internal/middleware"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func main() {
 
 	// Initialize repo and apply migrations
 	ctx := context.Background()
-	dbUrl := "postgres://piggy:secret@127.0.0.1:5432/piggydb?sslmode=disable"
+	dbUrl := "postgres://postgres:postgres@127.0.0.1:5432/piggydb?sslmode=disable"
 	dbConn, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		panic(err)
@@ -54,8 +55,20 @@ func main() {
 	handlers := handlers.NewHandler(appService)
 
 	// Define application endpoints
-	route.POST("/api/v1/transactions", handlers.CreateTransaction)
-	route.GET("/api/v1/transactions", handlers.GetTransactions) // Run application
+
+	// Public routes
+	route.POST("/api/v1/auth/register", handlers.Register)
+	route.POST("/api/v1/auth/login", handlers.Login)
+
+	// Protected routes
+	protected := route.Group("/api/v1")
+	protected.Use(middleware.AuthMiddleware())
+	{
+		protected.POST("/transactions", handlers.CreateTransaction)
+		protected.GET("/transactions", handlers.GetTransactions)
+	}
+
+	// Run application
 	fmt.Println("Server running on port 8080")
 	route.Run()
 }

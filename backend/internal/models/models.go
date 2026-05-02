@@ -1,6 +1,26 @@
 package models
 
 type User struct {
+	ID       int32 `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+}
+
+type LoginPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"name"`
+}
+
+type RegisterPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+}
+
+type AuthResponse struct {
+	Token string `json:"token"`
+	User  User `json:"user"`
 }
 
 type CreateTransactionPayload struct {
