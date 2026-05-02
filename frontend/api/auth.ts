@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:8080/api/v1";
 
 export const registerRequest = async (data: any) => {
-  const response = await fetch(`${BASE_URL}/register`, {
+  const response = await fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

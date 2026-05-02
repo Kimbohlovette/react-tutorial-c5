@@ -34,7 +34,7 @@ userID := int32(val)
 		return
 	}
 
-	transaction, err := h.service.CreateTransaction(c, userID,  payload)
+	transaction, err := h.service.CreateTransaction(c, &userID,  payload)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -60,7 +60,7 @@ func (h *Handler) GetTransactions(c *gin.Context) {
 
 
 //register and login
-func (h *Handler) Register(c *gin.Context) {
+func (h *Handler) SignUp(c *gin.Context) {
     var payload models.RegisterPayload
     if err := c.ShouldBindJSON(&payload); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})

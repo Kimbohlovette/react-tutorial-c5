@@ -24,7 +24,7 @@ func main() {
 	route.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-User-ID"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -56,6 +56,9 @@ func main() {
 	handlers := handlers.NewHandler(appService, authService)
 
 	// Define application endpoints
+	route.POST("/api/v1/signup", handlers.SignUp)
+route.POST("/api/v1/login", handlers.Login)
+
 	route.POST("/api/v1/transactions", handlers.CreateTransaction)
 	route.GET("/api/v1/transactions", handlers.GetTransactions) // Run application
 	fmt.Println("Server running on port 8080")
