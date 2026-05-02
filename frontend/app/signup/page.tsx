@@ -9,7 +9,7 @@ const SignupPage = () => {
   const router = useRouter();
  
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -54,12 +54,13 @@ const SignupPage = () => {
               Full Name
             </label>
             <input
-              name="fullName"
+              name="name"
               type="text"
               required
               className="w-full bg-[#0f172a] border border-slate-600 rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
               placeholder="John Doe"
               onChange={handleChange}
+              value={formData.name}
             />
           </div>
 
@@ -74,6 +75,7 @@ const SignupPage = () => {
               className="w-full bg-[#0f172a] border border-slate-600 rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
               placeholder="name@example.com"
               onChange={handleChange}
+              value={formData.email}
             />
           </div>
 
@@ -88,6 +90,7 @@ const SignupPage = () => {
               className="w-full bg-[#0f172a] border border-slate-600 rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
               placeholder="••••••••"
               onChange={handleChange}
+              value={formData.password}
             />
           </div>
 

@@ -45,7 +45,12 @@ userID := int32(val)
 
 
 func (h *Handler) GetTransactions(c *gin.Context) {
-	userID := c.MustGet("userID").(*int32) // Get user ID from context, set by auth middleware
+	val, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Please log in again"})
+        return
+    }
+    userID := val.(*int32)
 	
 	// Get the transaction type from query parameters, default to empty string if not provided
 	transactionType := c.Query("type")
@@ -54,6 +59,10 @@ func (h *Handler) GetTransactions(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	if transactions == nil {
+        c.JSON(http.StatusOK, []interface{}{})
+        return
+    }
 
 	c.JSON(http.StatusOK, transactions)
 }

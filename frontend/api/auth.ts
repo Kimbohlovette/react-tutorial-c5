@@ -5,11 +5,12 @@ export const registerRequest = async (data: any) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      name: data.fullName,
+      name: data.name,
       email: data.email,
       password: data.password,
     }),
   });
+  console.log(data)
   return response;
 };
 

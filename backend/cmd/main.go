@@ -14,6 +14,7 @@ import (
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/db/sqlc"
 	"piggy.com/internal/handlers"
+	"piggy.com/internal/middleware"
 	"piggy.com/internal/piggyservice"
 )
 
@@ -54,13 +55,23 @@ func main() {
 	appService := piggyservice.NewService(repostory)
 	authService := piggyservice.NewAuthService(repostory.Do().(*sqlc.Queries))
 	handlers := handlers.NewHandler(appService, authService)
+  
 
+	v1 := route.Group("/api/v1")
 	// Define application endpoints
-	route.POST("/api/v1/signup", handlers.SignUp)
-route.POST("/api/v1/login", handlers.Login)
+	v1.POST("/signup", handlers.SignUp)
+    v1.POST("/api/v1/login", handlers.Login)
 
-	route.POST("/api/v1/transactions", handlers.CreateTransaction)
-	route.GET("/api/v1/transactions", handlers.GetTransactions) // Run application
+	//protected routes
+	protected := v1.Group("/")
+	protected.Use(middleware.AuthMiddleware())
+    
+	
+	{
+		protected.GET("/api/v1/transactions", handlers.GetTransactions) 
+		route.POST("/api/v1/transactions", handlers.CreateTransaction)
+		
+	}
 	fmt.Println("Server running on port 8080")
 	route.Run()
 }

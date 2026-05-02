@@ -2,14 +2,18 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-
+import { useAuth } from "@/hooks/useAuth";
 const LoginPage = () => {
+
+  const { login, isLoading } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle authentication logic here
+    await login({ email, password });
     console.log("Logging in with:", { email, password });
   };
 
