@@ -9,24 +9,26 @@ import { toast, ToastContainer } from "react-toastify";
 function WithdrawPage() {
 	const [amount, setAmount] = useState("");
 	const [reason, setReason] = useState("");
-	const handleWithdraw = () => {
-		console.log("Executed!");
-		const payload: TransactionType = {
-			amount,
-			reason,
-			type: "withdrawal",
-			createdAt: Date(),
-		};
-		const res = saveTransaction(payload);
-
-		console.log("Response from fetch: ", res);
-
-		if (res.success) {
-			toast("Withdrawal successful! Redirecting...");
-		} else {
-			toast.error("Failed to withdraw money! Try again.");
-		}
+	
+	// Update the handleWithdraw function
+	const handleWithdraw = async () => {
+	console.log("Executed!");
+	const payload: TransactionType = {
+		amount,
+		reason,
+		type: "withdrawal",
+		createdAt: Date(),
 	};
+	const res = await saveTransaction(payload);
+
+	console.log("Response from fetch: ", res);
+
+	if (res.success) {
+		toast.success("Withdrawal successful! Redirecting...");
+	} else {
+		toast.error("Failed to withdraw money! Try again.");
+	}
+};
 
 	return (
 		<div className="flex flex-col flex-1 min-h-screen bg-slate-50 dark:bg-slate-900">
