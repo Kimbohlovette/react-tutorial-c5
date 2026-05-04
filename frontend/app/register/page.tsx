@@ -2,6 +2,7 @@
 import {  register } from "@/api/auth";
 import Button from "@/components/Button";
 import {UserCredentials } from "@/types/interfaces";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -10,8 +11,9 @@ function RegisterPage() {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [showPassword, setShowPassword] = useState(false)
+    const router = useRouter();
     
-    const togglePassword = () => setShowPassword(!showPassword)
+    const togglePassword = () => setShowPassword(!showPassword);
 
     const handleRegister = () => {
         console.log("Executed!");
@@ -29,7 +31,7 @@ function RegisterPage() {
         if (res.success) {
             toast("Account creation successful! Redirecting...");
             setTimeout(() => {
-			window.location.href = "/login"
+			router.push("/login")
 		}, 2000);
          } else {
              toast.error("Failed to create account! Try again.");

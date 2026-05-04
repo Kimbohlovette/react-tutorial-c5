@@ -4,6 +4,7 @@ import { saveTransaction } from "@/api/create-transaction";
 import Button from "@/components/Button";
 import Navbar from "@/components/navbar";
 import { LoginCredentials, TransactionType, UserCredentials } from "@/types/interfaces";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -12,8 +13,9 @@ function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false)
+    const router = useRouter();
 
-    const togglePassword = () => setShowPassword(!showPassword)
+    const togglePassword = () => setShowPassword(!showPassword);
 
     const handleLogin = () => {
         console.log("Executed!");
@@ -29,7 +31,7 @@ function LoginPage() {
                 if (res.success) {
                     toast("Log in successful! Redirecting...");
                     setTimeout(() => {
-                    window.location.href = "/dashboard"
+                    router.push("/dashboard")
                 }, 2000);
                  } else {
                      toast.error("Incorrect credentials! Try again.");

@@ -3,12 +3,15 @@ import { saveTransaction } from "@/api/create-transaction";
 import Button from "@/components/Button";
 import Navbar from "@/components/navbar";
 import { TransactionType } from "@/types/interfaces";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 function SavePage() {
 	const [amount, setAmount] = useState("");
 	const [reason, setReason] = useState("");
+	const router = useRouter()
+
 	// Handle save transaction
 	const handleSave = () => {
 		console.log("Executed!");
@@ -29,7 +32,7 @@ function SavePage() {
 		}
 
 		setTimeout(() => {
-			window.location.href = "/dashboard"
+			router.push("/dashboard")
 		}, 2000);
 
 	};
