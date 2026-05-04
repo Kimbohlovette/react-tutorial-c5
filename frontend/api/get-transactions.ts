@@ -5,7 +5,7 @@ export interface GetTransactionsRes {
 	transactions: TransactionType[];
 	error: any;
 }
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_BASEURL;
 
 export const getAllTransactions = async (
 	query: GetTransactionsParamsType,

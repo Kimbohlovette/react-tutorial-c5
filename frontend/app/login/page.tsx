@@ -1,5 +1,5 @@
 "use client";
-import { Login } from "@/api/auth";
+import { login } from "@/api/auth";
 import { saveTransaction } from "@/api/create-transaction";
 import Button from "@/components/Button";
 import Navbar from "@/components/navbar";
@@ -22,7 +22,7 @@ function LoginPage() {
             password,
         };
 
-        const res = Login(payload);
+        const res = login(payload);
         
                 console.log("Response from post: ", res);
         
@@ -53,6 +53,7 @@ function LoginPage() {
                                 placeholder="username or email"
                                 value={username}
                                 onChange={(v) => setUsername(v.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex relative flex-col gap-1">
@@ -60,6 +61,9 @@ function LoginPage() {
                                 Password
                             </label>
                             <input
+                            name="password"
+                            id="password"
+                            required
                             type={showPassword? "text" : "password"}
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 value={password}

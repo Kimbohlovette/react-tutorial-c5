@@ -1,5 +1,5 @@
 "use client";
-import {  Register } from "@/api/auth";
+import {  register } from "@/api/auth";
 import Button from "@/components/Button";
 import {UserCredentials } from "@/types/interfaces";
 import React, { useState } from "react";
@@ -22,7 +22,7 @@ function RegisterPage() {
             createdAt: Date(),
         };
 
-        const res = Register(payload);
+        const res = register(payload);
 
         console.log("Response from post: ", res);
 
@@ -49,10 +49,14 @@ function RegisterPage() {
                                 Email
                             </label>
                             <input
+                            type="email"
+                            name="email"
+                            id="email"
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 placeholder="enter email"
                                 value={email}
                                 onChange={(v) => setEmail(v.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex flex-col gap-1">
@@ -60,10 +64,14 @@ function RegisterPage() {
                                 Username
                             </label>
                             <input
+                            type="text"
+                            name="username"
+                            id="username"
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 placeholder="enter username"
                                 value={username}
                                 onChange={(v) => setUsername(v.target.value)}
+                                required
                             />
                         </div>
                         
@@ -73,6 +81,9 @@ function RegisterPage() {
                             </label>
                             <input
                             type={showPassword? "text" : "password"}
+                            name="password"
+                            id="password"
+                            required
                                 className="border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-100"
                                 value={password}
                                 onChange={(value) =>

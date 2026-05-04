@@ -6,15 +6,16 @@ export interface ResponseType {
 	error: any;
 }
 
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_BASEURL;
 
 
-export const Register = (payload: UserCredentials) => {
+export const register = (payload: UserCredentials) => {
     console.log("Fetch function executed!");
     let response: ResponseType = {
         error: null,
         success: true,
     };
+
     axios
     	.post(BASEURL + "/api/v1/register", payload)
     	.then((res) => {
@@ -30,10 +31,11 @@ export const Register = (payload: UserCredentials) => {
     			success: false,
     		};
     	});
+
     return response;
 };
 
-export const Login = (payload:LoginCredentials ) => {
+export const login = (payload:LoginCredentials ) => {
     console.log("Fetch function executed!");
     let response: ResponseType = {
         error: null,

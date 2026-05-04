@@ -6,7 +6,7 @@ export interface ResponseType {
 	error: any;
 }
 
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_BASEURL;
 
 export const saveTransaction = (payload: TransactionType) => {
 	console.log("Fetch function executed!");
