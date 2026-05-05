@@ -38,6 +38,33 @@ func (q *Queries) AddToUserSavings(ctx context.Context, arg AddToUserSavingsPara
 	return i, err
 }
 
+const addToUserWithdrawals = `-- name: AddToUserWithdrawals :one
+UPDATE users 
+SET total_withdrawals = (CAST(total_withdrawals AS NUMERIC) + CAST($1 AS NUMERIC))::VARCHAR
+WHERE id = $2
+RETURNING id, name, email, password_hash, created_at, total_savings, total_withdrawals
+`
+
+type AddToUserWithdrawalsParams struct {
+	Amount pgtype.Numeric `json:"amount"`
+	ID     int32          `json:"id"`
+}
+
+func (q *Queries) AddToUserWithdrawals(ctx context.Context, arg AddToUserWithdrawalsParams) (User, error) {
+	row := q.db.QueryRow(ctx, addToUserWithdrawals, arg.Amount, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.TotalSavings,
+		&i.TotalWithdrawals,
+	)
+	return i, err
+}
+
 const createTransaction = `-- name: CreateTransaction :one
 INSERT INTO transactions (user_id,amount, reason, type) VALUES ($1, $2, $3, $4) RETURNING id, user_id, amount, reason, created_at, type
 `

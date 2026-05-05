@@ -27,3 +27,9 @@ UPDATE users
 SET total_savings = (CAST(total_savings AS NUMERIC) + CAST(@amount AS NUMERIC))::VARCHAR
 WHERE id = @id
 RETURNING *;
+
+-- name: AddToUserWithdrawals :one
+UPDATE users 
+SET total_withdrawals = (CAST(total_withdrawals AS NUMERIC) + CAST(@amount AS NUMERIC))::VARCHAR
+WHERE id = @id
+RETURNING *;

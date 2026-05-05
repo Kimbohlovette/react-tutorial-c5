@@ -21,6 +21,7 @@ func NewService(repo repo.Repository) *Service {
 // define service methods here
 
 func (s *Service) CreateTransaction(ctx context.Context, userID *int32, payload models.CreateTransactionPayload) (*models.Transaction, error) {
+
 	 querier, tx , err := s.repo.Begin(ctx)
 	 if err != nil {
 		return nil, err
@@ -50,7 +51,13 @@ func (s *Service) CreateTransaction(ctx context.Context, userID *int32, payload 
 
 		})
 		
-	}
+		
+	} else if payload.Type == "withdrawal" {
+			_, err = querier.AddToUserWithdrawals(ctx , sqlc.AddToUserWithdrawalsParams{
+				Amount: numericAmount,
+				ID: *userID,
+			})
+		}
 	if err != nil {
 			return nil, err
 		}

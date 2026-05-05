@@ -4,7 +4,7 @@ import axios from "axios";
 //   transactions: TransactionType[];
 //   error: any;
 // }
-const BASEURL = "http://localhost:8080";
+import { BASE_URL } from "@/lib/constants";
 export const getAllTransactions = async (
 	query: GetTransactionsParamsType,
 ): Promise<TransactionType[]> => {
@@ -19,10 +19,10 @@ export const getAllTransactions = async (
 	}
 
 	const url =
-		BASEURL +
-		"/api/v1/transactions" +
-		(queries.length > 0 ? "?" : "") +
-		queries.join("&");
+    BASE_URL +
+    "/transactions" +
+    (queries.length > 0 ? "?" : "") +
+    queries.join("&");
 
 	try {
 		const storedId = localStorage.getItem("piggy_user_id");

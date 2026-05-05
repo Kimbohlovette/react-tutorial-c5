@@ -26,7 +26,11 @@ func (h *Handler) CreateTransaction(c *gin.Context) {
    
 	//userID := c.MustGet("userID").(*int32) // Get user ID from context, set by auth middleware
    idStr := c.GetHeader("X-User-ID")
-val, _ := strconv.ParseInt(idStr, 10, 32)
+val, err := strconv.ParseInt(idStr, 10, 32)
+if err != nil {
+    c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User ID"})
+    return
+}
 userID := int32(val)
 	var payload models.CreateTransactionPayload
 	if err := c.ShouldBindJSON(&payload); err != nil {

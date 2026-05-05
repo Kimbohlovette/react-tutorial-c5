@@ -10,14 +10,14 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const res = await registerRequest(formData);
-      const data = await res.json();
-      const userId = data.user_id || data.id || data.ID;
+      // const data = await res.json();
+      const userId = res.user_id || res.id || res.ID;
 
       if (userId) {
         localStorage.setItem("piggy_user_id", userId.toString());
         router.push("/");
       } else {
-        alert(data.error || "User ID was not found in the response!");
+        alert("Account created, but no User ID received. Try logging in.");
       }
     } catch (err) {
       alert("Connection error");
@@ -32,23 +32,23 @@ export const useAuth = () => {
     try {
       const res = await loginRequest(formData);
 
-     
-      const data = await res.json();
+      // const data = await res.json();
 
-      if (res.ok) {
-        const userId = data.user_id || data.id || data.ID;
+      // if (res.ok) {
+      const userId = res.user_id || res.id || res.ID;
 
-        if (userId) {
-          localStorage.setItem("piggy_user_id", userId.toString());
-          router.push("/");
-        } else {
-          alert("Login successful, but no User ID received");
-        }
+      if (userId) {
+        localStorage.setItem("piggy_user_id", userId.toString());
+        router.push("/");
       } else {
-        alert(data.error || "Login failed");
+        alert("Login successful, but no User ID received");
       }
-    } catch (err) {
-      console.error("Login Error:", err);
+      // } else {
+      //   alert(res.error || "Login failed");
+      // }
+    } catch (err :any) {
+      const errorMsg = err.response?.data?.error || "Invalid email or password";
+      alert(errorMsg);
 
       alert("Server response was not valid JSON. Check Go terminal.");
     } finally {

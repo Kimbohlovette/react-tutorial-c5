@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	AddToUserSavings(ctx context.Context, arg AddToUserSavingsParams) (User, error)
+	AddToUserWithdrawals(ctx context.Context, arg AddToUserWithdrawalsParams) (User, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]Transaction, error)
