@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"time"
- "github.com/joho/godotenv"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 
 	"piggy.com/internal/db/repo"
@@ -18,6 +20,9 @@ import (
 	"piggy.com/internal/middleware"
 	"piggy.com/internal/piggyservice"
 )
+func init() {
+	net.DefaultResolver.PreferGo = true
+}
 func buildDBUrl() string {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -27,7 +32,7 @@ func buildDBUrl() string {
 	sslmode := os.Getenv("DB_SSLMODE")
 
 	if sslmode == "" {
-		sslmode = "disable"
+		sslmode = "require" // Supabase MUST use SSL
 	}
 
 	if host == "" || port == "" || user == "" || dbname == "" {
