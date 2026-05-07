@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
-
+ "github.com/joho/godotenv"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,8 +18,36 @@ import (
 	"piggy.com/internal/middleware"
 	"piggy.com/internal/piggyservice"
 )
+func buildDBUrl() string {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	sslmode := os.Getenv("DB_SSLMODE")
+
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+
+	if host == "" || port == "" || user == "" || dbname == "" {
+		panic("missing required database env vars")
+	}
+
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		user,
+		password,
+		host,
+		port,
+		dbname,
+		sslmode,
+	)
+}
+
 
 func main() {
+	godotenv.Load()
 	route := gin.Default()
 
 	// Configure Cors
@@ -40,14 +69,15 @@ func main() {
 
 	// Initialize repo and apply migrations
 	ctx := context.Background()
-	dbUrl := "postgres://piggy:secret@127.0.0.1:5432/piggydb?sslmode=disable"
+	dbUrl := buildDBUrl()
 	dbConn, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Database connection established!")
 	repostory := repo.NewRepository(dbConn)
-	if err :=repo.MigrateUp(dbUrl, "./internal/db/migrations", zerolog.Nop().With().Logger());err !=nil{
+	migrationPath := getEnv("MIGRATIONS_PATH", "./internal/db/migrations")
+	if err :=repo.MigrateUp(dbUrl, migrationPath, zerolog.Nop().With().Logger());err !=nil{
 		panic(err)
 	}
 
@@ -74,4 +104,13 @@ func main() {
 	}
 	fmt.Println("Server running on port 8080")
 	route.Run()
+}
+
+
+
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
 }
