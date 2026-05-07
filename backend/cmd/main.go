@@ -71,7 +71,16 @@ func main() {
 			"message": "Healthy!",
 		})
 	})
+ //
+ var resolver = &net.Resolver{
+	PreferGo: true,
+	Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+		d := net.Dialer{}
+		return d.DialContext(ctx, "udp4", "8.8.8.8:53")
+	},
+}
 
+net.DefaultResolver = resolver
 	// Initialize repo and apply migrations
 	ctx := context.Background()
 	dbUrl := buildDBUrl()
