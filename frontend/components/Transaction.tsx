@@ -3,10 +3,11 @@ import React from "react";
 
 function Transaction({ amount, type, reason, createdAt }: TransactionType) {
 	const isSaving = type === "saving";
+	
 	return (
 		<tr className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
 			<td className="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">
-				{amount} CFA
+				{Number(amount).toLocaleString()} CFA
 			</td>
 			<td className="py-3 px-4">
 				<span
@@ -20,10 +21,10 @@ function Transaction({ amount, type, reason, createdAt }: TransactionType) {
 				</span>
 			</td>
 			<td className="py-3 px-4 text-slate-600 dark:text-slate-400">
-				{reason}
+				{reason || "No reason"}
 			</td>
 			<td className="py-3 px-4 text-slate-500 dark:text-slate-500 text-sm">
-				{new Date(createdAt).toLocaleDateString()}
+				{createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
 			</td>
 		</tr>
 	);
