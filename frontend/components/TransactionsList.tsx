@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import Transaction from "./Transaction";
-import { type TransactionType } from "./Transaction";
+import { type TransactionType } from "@/types/interfaces";
 
 export interface TransactionsListProps {
-	transactions: TransactionProps[];
+	transactions: TransactionType[];
 }
 function TransactionsList({ transactions }: TransactionsListProps) {
 	return (
