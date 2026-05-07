@@ -20,9 +20,9 @@ import (
 	"piggy.com/internal/middleware"
 	"piggy.com/internal/piggyservice"
 )
-func init() {
-	net.DefaultResolver.PreferGo = true
-}
+// func init() {
+// 	net.DefaultResolver.PreferGo = true
+// }
 func buildDBUrl() string {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -75,7 +75,25 @@ func main() {
 	// Initialize repo and apply migrations
 	ctx := context.Background()
 	dbUrl := buildDBUrl()
-	dbConn, err := pgxpool.New(ctx, dbUrl)
+	// dbConn, err := pgxpool.New(ctx, dbUrl)
+	dialer := &net.Dialer{
+	Timeout: 5 * time.Second,
+}
+
+config, err := pgxpool.ParseConfig(dbUrl)
+if err != nil {
+	panic(err)
+}
+
+// 🔥 FORCE IPv4 ONLY (THIS FIXES YOUR ERROR)
+config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
+	return dialer.DialContext(ctx, "tcp4", addr)
+}
+
+dbConn, err := pgxpool.NewWithConfig(ctx, config)
+if err != nil {
+	panic(err)
+}
 	if err != nil {
 		panic(err)
 	}
