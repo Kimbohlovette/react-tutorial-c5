@@ -29,6 +29,7 @@ type DBConfig struct {
     DBName      string `conf:"env:DB_NAME,required"`
     TLSDisabled bool   `conf:"env:DB_TLS_DISABLED"`
 	JWTSecret string `conf:"env:JWT_SECRET,required,mask"`
+	FRONTENDURL string `conf:"env:FRONTEND_URL,required,mask"`
 }
 
 func main() {
@@ -51,7 +52,7 @@ func main() {
 
 	// Configure Cors
 	route.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{cfg.FRONTENDURL},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
