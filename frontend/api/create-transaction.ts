@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TransactionType } from "@/types/interfaces";
 import { api } from "@/utils/auth";
 

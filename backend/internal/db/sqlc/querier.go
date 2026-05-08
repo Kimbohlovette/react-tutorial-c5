@@ -13,8 +13,12 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetTransactionByID(ctx context.Context, id int32) (GetTransactionByIDRow, error)
 	GetTransactions(ctx context.Context) ([]GetTransactionsRow, error)
+	GetTransactionsByUserID(ctx context.Context, userID *int32) ([]GetTransactionsByUserIDRow, error)
+	GetUserAccountInfo(ctx context.Context, id int32) (UserAccountInfo, error)
+	GetUserBalance(ctx context.Context, id int32) (*string, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int32) (User, error)
+	UpdateUserBalance(ctx context.Context, arg UpdateUserBalanceParams) error
 }
 
 var _ Querier = (*Queries)(nil)

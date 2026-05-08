@@ -23,4 +23,13 @@ type User struct {
 	Password  string    `json:"password"`
 	Name      *string   `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
+	Balance   *string   `json:"balance"`
+}
+
+type UserAccountInfo struct {
+	ID        int32     `json:"id"`
+	Email     string    `json:"email"`
+	Name      *string   `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	Balance   *string   `json:"balance"`
 }

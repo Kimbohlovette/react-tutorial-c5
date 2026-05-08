@@ -121,3 +121,46 @@ func (q *Queries) GetTransactions(ctx context.Context) ([]GetTransactionsRow, er
 	}
 	return items, nil
 }
+
+const getTransactionsByUserID = `-- name: GetTransactionsByUserID :many
+SELECT id, amount, type, reason, created_at, user_id 
+FROM transactions
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+type GetTransactionsByUserIDRow struct {
+	ID        int32     `json:"id"`
+	Amount    string    `json:"amount"`
+	Type      *string   `json:"type"`
+	Reason    *string   `json:"reason"`
+	CreatedAt time.Time `json:"created_at"`
+	UserID    *int32    `json:"user_id"`
+}
+
+func (q *Queries) GetTransactionsByUserID(ctx context.Context, userID *int32) ([]GetTransactionsByUserIDRow, error) {
+	rows, err := q.db.Query(ctx, getTransactionsByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetTransactionsByUserIDRow{}
+	for rows.Next() {
+		var i GetTransactionsByUserIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Amount,
+			&i.Type,
+			&i.Reason,
+			&i.CreatedAt,
+			&i.UserID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

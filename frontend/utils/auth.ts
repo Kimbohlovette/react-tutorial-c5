@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
 export const getToken = (): string | null => {
 	if (typeof window !== "undefined") {

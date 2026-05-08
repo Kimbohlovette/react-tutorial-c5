@@ -4,20 +4,25 @@ import Navbar from "@/components/navbar";
 import TransactionsList from "@/components/TransactionsList";
 import Button from "@/components/Button";
 import { useGetTransactions } from "@/hooks/useFetchTransactions";
+import { useFetchAccountInfo } from "@/hooks/useFetchAccountInfo";
 
 export default function Home() {
 	const recentTransactions = useGetTransactions({ size: 5 });
-	console.log("In the component: ", recentTransactions);
+	const { accountInfo, loading: accountLoading } = useFetchAccountInfo();
+
 	return (
 		<>
 			<div className="flex flex-col flex-1 min-h-screen bg-slate-50 dark:bg-slate-900">
 				<Navbar />
 				<main className="flex-1 w-full max-w-3xl mx-auto px-6 py-10 flex flex-col gap-8">
 					<section className="flex gap-4">
-						<StatsCard title="Total Savings" text="53,000 CFA" />
+						<StatsCard 
+							title="Current Balance" 
+							text={accountInfo ? `${accountInfo.balance.toLocaleString()} CFA` : accountLoading ? "Loading..." : "0 CFA"} 
+						/>
 						<StatsCard
-							title="Total Withdrawals"
-							text="100,000 CFA"
+							title="Account Status"
+							text={accountInfo ? "Active" : "Loading..."}
 						/>
 					</section>
 					<section className="flex gap-3">

@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllTransactions } from "@/api/get-transactions";
+import { getToken } from "@/utils/auth";
 import { GetTransactionsParamsType, TransactionType } from "@/types/interfaces";
 import { useEffect, useState } from "react";
 
@@ -12,6 +14,14 @@ export const useGetTransactions = (query: GetTransactionsParamsType) => {
 			try {
 				setLoading(true);
 				setError(null);
+				
+				// Check if user is authenticated
+				const token = getToken();
+				if (!token) {
+					setLoading(false);
+					return;
+				}
+				
 				const res = await getAllTransactions(query);
 				setTransactions(res.transactions || []);
 			} catch (err: any) {

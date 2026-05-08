@@ -24,7 +24,14 @@ func (h *Handler) CreateTransaction(c *gin.Context) {
 		return
 	}
 
-	transaction, err := h.service.CreateTransaction(c, payload)
+	// Get user ID from context (set by auth middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
+		return
+	}
+
+	transaction, err := h.service.CreateTransaction(c, userID.(int32), payload)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -33,13 +40,36 @@ func (h *Handler) CreateTransaction(c *gin.Context) {
 	c.JSON(http.StatusOK, transaction)
 }
 
-
 func (h *Handler) GetTransactions(c *gin.Context) {
-	transactions, err := h.service.GetTransactions(c)
+	// Get user ID from context (set by auth middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
+		return
+	}
+
+	transactions, err := h.service.GetTransactionsByUserID(c, userID.(int32))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, transactions)
+}
+
+func (h *Handler) GetUserAccount(c *gin.Context) {
+	// Get user ID from context (set by auth middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
+		return
+	}
+
+	accountInfo, err := h.service.GetUserAccountInfo(c, userID.(int32))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, accountInfo)
 }

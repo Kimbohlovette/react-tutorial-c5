@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -5,7 +6,7 @@ import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 function RegisterPage() {
 	const [name, setName] = useState("");
