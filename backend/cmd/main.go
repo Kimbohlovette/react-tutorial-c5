@@ -4,25 +4,40 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/rs/zerolog"
+	"github.com/joho/godotenv"
 
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/handlers"
-	"piggy.com/internal/piggyservice"
 	"piggy.com/internal/middleware"
+	"piggy.com/internal/piggyservice"
 )
 
 func main() {
+	// Load environment variables from .env file
+	godotenv.Load()
+
 	route := gin.Default()
+
+	// Get environment variables
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		dbURL = "postgres://postgres:postgres@127.0.0.1:5432/piggydb?sslmode=disable"
+	}
+
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
 
 	// Configure Cors
 	route.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{frontendURL},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -39,16 +54,14 @@ func main() {
 
 	// Initialize repo and apply migrations
 	ctx := context.Background()
-	dbUrl := "postgres://postgres:postgres@127.0.0.1:5432/piggydb?sslmode=disable"
-	dbConn, err := pgxpool.New(ctx, dbUrl)
+	dbConn, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Database connection established!")
 	repostory := repo.NewRepository(dbConn)
-	if err :=repo.MigrateUp(dbUrl, "./internal/db/migrations", zerolog.Nop().With().Logger());err !=nil{
-		panic(err)
-	}
+	// Migrations are already applied via Supabase CLI (supabase db push)
+	// No need to run MigrateUp here
 
 	// Initialize service
 	appService := piggyservice.NewService(repostory)
@@ -66,9 +79,14 @@ func main() {
 	{
 		protected.POST("/transactions", handlers.CreateTransaction)
 		protected.GET("/transactions", handlers.GetTransactions)
+		protected.GET("/account", handlers.GetUserAccount)
 	}
 
 	// Run application
-	fmt.Println("Server running on port 8080")
-	route.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	fmt.Printf("Server running on port %s\n", port)
+	route.Run(":" + port)
 }

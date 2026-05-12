@@ -8,6 +8,12 @@ SELECT id, amount, type, reason, created_at, user_id
 FROM transactions
 ORDER BY created_at DESC;
 
+-- name: GetTransactionsByUserID :many
+SELECT id, amount, type, reason, created_at, user_id 
+FROM transactions
+WHERE user_id = $1
+ORDER BY created_at DESC;
+
 -- name: GetTransactionByID :one
 SELECT id, amount, type, reason, created_at, user_id 
 FROM transactions

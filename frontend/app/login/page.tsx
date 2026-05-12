@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -5,7 +6,7 @@ import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 
-const BASEURL = "http://localhost:8080";
+const BASEURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -84,7 +85,7 @@ function LoginPage() {
 						</button>
 					</form>
 					<p className="mt-4 text-sm text-center text-slate-600 dark:text-slate-400">
-						Don't have an account?{" "}
+						Don&apos;t have an account?{" "}
 						<Link
 							href="/register"
 							className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"

@@ -1,11 +1,21 @@
 "use client";
 import React from "react";
-import Transaction, { TransactionProps } from "./Transaction";
+import Transaction from "./Transaction";
+import { TransactionType } from "@/types/interfaces";
 
 export interface TransactionsListProps {
-	transactions: TransactionProps[];
+	transactions: TransactionType[];
 }
+
 function TransactionsList({ transactions }: TransactionsListProps) {
+	if (!transactions || transactions.length === 0) {
+		return (
+			<div className="w-full text-center py-8 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+				No transactions to display.
+			</div>
+		);
+	}
+
 	return (
 		<div className="w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
 			<table className="w-full text-sm">
@@ -19,7 +29,7 @@ function TransactionsList({ transactions }: TransactionsListProps) {
 				</thead>
 				<tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-700">
 					{transactions.map((trnx, index) => (
-						<Transaction key={index} {...trnx} />
+						<Transaction key={trnx.id || index} {...trnx} />
 					))}
 				</tbody>
 			</table>
