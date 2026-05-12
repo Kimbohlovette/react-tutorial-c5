@@ -1,3 +1,7 @@
+# Using Supabase for database
+# Local PostgreSQL is no longer needed
+# To test locally with PostgreSQL, uncomment the db service below
+
 services:
   db:
     image: postgres:17-alpine
@@ -9,22 +13,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U piggy -d piggydb" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d piggydb" ]
       interval: 5s
       retries: 10
     ports:
       - 5432:5432
-  # api:
-  #   build: .
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${PORT:-3000}:3000"
-  #   env_file: .env
-  #   environment:
-  #     DATABASE_URL: postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-cameroon_utility_alerts}
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
 
 volumes:
   pgdata:

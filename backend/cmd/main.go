@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"github.com/rs/zerolog"
 
 	"piggy.com/internal/db/repo"
 	"piggy.com/internal/handlers"
@@ -61,9 +60,8 @@ func main() {
 	}
 	fmt.Println("Database connection established!")
 	repostory := repo.NewRepository(dbConn)
-	if err := repo.MigrateUp(dbURL, "./internal/db/migrations", zerolog.Nop().With().Logger()); err != nil {
-		panic(err)
-	}
+	// Migrations are already applied via Supabase CLI (supabase db push)
+	// No need to run MigrateUp here
 
 	// Initialize service
 	appService := piggyservice.NewService(repostory)
